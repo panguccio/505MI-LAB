@@ -2,13 +2,13 @@
 
 Second laboratory for the **Cybersecurity Laboratory** course.
 
-**Objective:** Exploit, analyze and understand XSS vulnerabilities using the [**OWASP Juice Shop**](https://owasp.org/www-project-juice-shop/) web application.
+**Objective:** exploit and understand XSS vulnerabilities using the [**OWASP Juice Shop**](https://owasp.org/www-project-juice-shop/) web application.
 
 ## Introduction
 
-### Lab requirements
+### Lab aim
 
-The primary objective of this laboratory was to successfully execute and document 2 distinct types of XSS attacks within the OWASP Juice Shop environment:
+The objective of this laboratory was to successfully execute and document two distinct types of XSS challenges within the OWASP Juice Shop environment:
 
 * a [DOM XSS](##DOM XSS) attack
 * a [Reflected XSS](##Reflected XSS) attack
@@ -48,7 +48,7 @@ Once initialized, the web application can be accessed at: `http://localhost:3000
 
 <img src="images/Screenshot 2026-06-11 alle 17.22.06.png" alt="juice shop home page" style="zoom:20%;" />
 
-#### Score board
+#### The Challenges
 
 By analyzing the routing structure of the single-page application, the URL for the hidden score board was inferred, as it was similar to the photo wall page URL (`http://localhost:3000/#/photo-wall`).
 
@@ -78,7 +78,7 @@ The attempt was successful, as the payload was executed, rendering the alert box
 
 <img src="images/Screenshot 2026-06-22 alle 12.49.59.png" alt="this image shows that in the HTML for the page the box where the search query should appear, there's the iframe that was injected" style="zoom:50%;" />
 
-### Understanding why
+### Understanding root causes
 
 To understand what was happening "under the hood", the client-side source code was inspected using the browser's **Developer Tools** (Sources tab). The core application logic was found in the `main.js` file and, specifically for this challenge, within the `filterTable()` method.
 
@@ -104,7 +104,7 @@ The application extracts the query directly from the URL (`this.route.snapshot.q
 
 At line 9, the code explicitly invokes the method `this.sanitizer.bypassSecurityTrustHtml(e)` and assigns it to `this.searchValue`. This is the **sink**. 
 
- `bypassSecurityTrustHtml` is a built-in Angular method  (as can be found [here](https://angular.dev/api/platform-browser/DomSanitizer)) that bypasses security and trusts the given value to be **safe HTML**. 
+`bypassSecurityTrustHtml` is a built-in Angular method  (as can be found [here](https://angular.dev/api/platform-browser/DomSanitizer)) that bypasses security and trusts the given value to be **safe HTML**. 
 
 The variable is the rendered as "Search Result - [`QUERY`]" at the top of the search results, as can be seen by the resulting HTML template:
 
@@ -123,7 +123,7 @@ This satisfies the definition of a DOM XSS attack, since the client-side JavaScr
 
 ## Reflected XSS
 
-### Exploitation attempt
+### Exploitation root causes
 
 The second challenge required identifying an input source that interacts with the backend server. 
 
@@ -141,9 +141,11 @@ The attempt was successful, as the payload was executed, rendering the alert box
 
 <img src="images/Screenshot 2026-06-22 alle 12.37.37.png" alt=" this image shows that in the HTML for the page the box where the orderId should appear, there's the iframe that was injected" style="zoom:30%;" />
 
-### Understanding why
+### Understanding root causes
 
 The execution was similar to the first challenge, however what was going on under the hood was very different.
+
+
 
 Analyzing the `main.js` file, the logic for getting the tracking informations was expressed by `ngOnInit()`. 
 
@@ -228,7 +230,9 @@ this.results.orderNo = this.sanitizer.bypassSecurityTrustHtml(`<code>${e.data[0]
 
 The resulting `orderId` from the HTTP response is inserted by the frontend inside an HTML tag, bypassing security. This way, what would be treated as text by default by Angular, is not sanitized and is interpreted as inner JS code by the browser.
 
-## DOM vs XSS
+## Takeaways
+
+### DOM vs Reflected
 
 The main difference between the two exploits is that:
 
