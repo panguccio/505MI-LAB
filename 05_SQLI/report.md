@@ -8,7 +8,7 @@ Third laboratory for the **Cybersecurity Laboratory** course.
 
 ### Lab aim
 
-The objective of this laboratory was to successfully execute and document at least two SQL injection challenges within the OWASP Juice Shop environment, in the categories:
+The objective of this laboratory was to execute and document at least two **SQL injection** challenges within the OWASP Juice Shop environment, in the categories:
 
 * attack to [bypass authentication](##Bypass Authentication)
 * attack to [extract data](##Extract Data)
@@ -18,7 +18,7 @@ Specifically, the report focuses on:
 * The exploitation attempts for solving the challenges;
 * Discussion on root causes and takeaways
 
-### Setup Juice Shop
+### Set up Juice Shop
 
 Refer to the [first lab]() for the setup of the Juice Shop container.
 
@@ -37,25 +37,25 @@ For authentication, the most obvious entry point was the **login page**.
 
 ### Is it vulnerable to an SQLi?
 
-To understand if there's a SQL vulnerability in the login page, the first attempt was to use as email the character `'`. If the system doesn't sanitize user input, then this character could potentially be interpreted as part of the code. The password could be anything.
+To understand if there's a SQL vulnerability in the login page, the first attempt was to use the character `'` as an email. If the system doesn't sanitise user input, this character could be interpreted as part of the code. The password could be anything.
 
 An unexpected `[object Object]` appeared. If the website worked correctly, that shouldn't be shown, so this confirms the suspicion.
 
 <img src="images/Screenshot 2026-06-24 alle 18.04.16.png" alt="the login page with ' as email is shown, with object object printed on top'" style="zoom:50%;" />
 
-To ensure that it's the case of an SQL vulnerability, the Network tab of the Browser's Developer Tools was analyzed to check for the server's response. The response confirmed the vulnerability and allows for a Blind SQLi, since it shows the SQL error at Database.
+To ensure it was an SQL vulnerability, the Network tab in the Browser's Developer Tools was analysed to review the server's response. The response confirmed the vulnerability and allows for a **in-band SQLi**.
 
 ![Screenshot 2026-06-24 alle 18.11.18](images/Screenshot 2026-06-24 alle 18.11.18.png)
 
 ### Exploit structure
 
-By analyzing the source code, inferences can be made on how to execute the injection.
+By analysing the source code, inferences can be made on how to execute the injection.
 
 ```sql
 SELECT * FROM Users WHERE email = '<email>' AND password = '<password>' AND [...]
 ```
 
-The first step involves finding the email of the admin (or whatever user is of interest). By looking into the comments of products, it can be found quite easily: `admin@juice-sh.op`.
+The first step is searching for the admin email (or other interesting users). By looking at the products' comments, it can be found quite easily: `admin@juice-sh.op`.
 
 <img src="images/Screenshot 2026-06-23 alle 12.14.39.png" style="zoom:26%;" />
 
@@ -67,33 +67,91 @@ The attempt was successful, as accessing with this "mail" and any password resul
 
 ### Understanding root causes
 
-<img src="images/Screenshot 2026-06-25 alle 12.53.19.png" alt=" " style="zoom:30%;" />
+The original code appears in the "coding challenges" section of the Scoreboard page. Here, the vulnerability is detected at line 15: the SQL query is built with string interpolation.
+
+```typescript
+export function login () {
+  function afterLogin (user: { data: User, bid: number }, res: Response, next: NextFunction) {
+    BasketModel.findOrCreate({ where: { UserId: user.data.id } })
+      .then(([basket]: [BasketModel, boolean]) => {
+        const token = security.authorize(user)
+        user.bid = basket.id // keep track of original basket
+        security.authenticatedUsers.put(token, user)
+        res.json({ authentication: { token, bid: basket.id, umail: user.data.email } })
+      }).catch((error: Error) => {
+        next(error)
+      })
+  }
+
+  return (req: Request, res: Response, next: NextFunction) => {
+    models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true })
+      .then((authenticatedUser) => {
+        const user = utils.queryResultToJson(authenticatedUser)
+        if (user.data?.id && user.data.totpSecret !== '') {
+          res.status(401).json({
+            status: 'totp_token_required',
+            data: {
+              tmpToken: security.authorize({
+                userId: user.data.id,
+                type: 'password_valid_needs_second_factor_token'
+              })
+            }
+          })
+        } else if (user.data?.id) {
+          afterLogin(user, res, next)
+        } else {
+          res.status(401).send(res.__('Invalid email or password.'))
+        }
+      }).catch((error: Error) => {
+        next(error)
+      })
+  }
+}
+```
+
+To fix this vulnerability, the `sequelize` **binding** mechanism can be used to create a prepared statement. This way, the user input cannot be interpreted as SQL code.
+
+```typescript
+models.sequelize.query(
+  `SELECT * FROM Users WHERE email = $1 AND password = $2 AND deletedAt IS NULL`,
+  {
+    bind: {
+      email: req.body.email || '',
+      password: security.hash(req.body.password || '')
+    }
+    model: UserModel,
+    plain: true,
+  }
+)
+```
 
 ## Extract Data
 
-The objective for this challenge is to retrieve a list of username and credentials from the `Users` table
+The objective for this challenge is to retrieve a list of usernames and credentials from the `Users` table.
 
 ### Access point
 
-To extract sensible data, finding the access point is less direct. A way to visualize the returned data from the database is needed. The idea is to search for an HTTP response that returns a `JSON`. Hopefully from there, by exploiting an SQL vulnerability, the `JSON` will be able to contain interesting data.
+To extract sensible data, finding the access point is less direct. The idea is to search for an HTTP request that explicitly returns database data as `JSON` and see if it's vulnerable to SQLi.
 
-In the homepage all the products are obtained at first access. By disabling cache and analyzing the HTTP history with Burp, a request to `/rest/products/search?q=` can be found and it returns a `JSON`.
+On the homepage, all the products are available at first access. By disabling cache and analysing the HTTP history with Burp, a request to `/rest/products/search?q=` can be found, it returns a `JSON`.
 
 <img src="images/Screenshot 2026-06-18 alle 15.44.06.png" alt=" " style="zoom:40%;" />
 
 ### Is it vulnerable to an SQLi?
 
-By visualizing the page and modifying the `q` parameter, the `JSON` will update.
+By accessing the corresponding page and modifying the query parameter, data can be obtained directly.
 
 <img src="images/Screenshot 2026-06-18 alle 15.44.59.png" alt=" " style="zoom:30%;" />
 
-To understand if an SQL vulnerability is present, different values for `q` can be tried, similarly to the first challenge. In particular, with `q = ' or '1'='1' --` all the products were returned without errors: so the query is interpreted as SQL code.
+In order to understand if an SQL vulnerability is present, different values for `q` are tried, similarly to the first challenge. In particular, with `q = ' or '1'='1' --` all the products were returned without errors: so the query is interpreted as SQL code. This allows for an **in-band SQLi**.
 
 ### User table structure
 
-At this point, the idea is to execute a union select with the Users table. However, in order to do that, the structure of such table needs to be known.
+At this point, the idea is to execute a union select with the Users table. However, in order to do that, the structure of that table needs to be known.
 
-From the error of the first challenge, it can be seen that the implementation of the SQL DBMS is done with the library SQLite. After [a quick Google search](https://stackoverflow.com/questions/6460671/sqlite-schema-information-metadata), it can be found that the informations about SQLite tables are kept in the `sqlite_master` table and that can be accessed with this syntax: `q=' UNION SELECT sql, "", "", null, null, null, null, null, null FROM sqlite_master WHERE name = 'Users' --`. 
+As seen from the error message of the first challenge, the SQL DBMS is implemented with the library **SQLite**. After [a quick Google search](https://stackoverflow.com/questions/6460671/sqlite-schema-information-metadata), it can be found that the structures of the tables in SQLite are kept in the `sqlite_master` table.
+
+Therefore, to obtain info about the Users table, this syntax can be used: `q=' UNION SELECT sql, "", "", null, null, null, null, null, null FROM sqlite_master WHERE name = 'Users' --`. 
 
 The resulting URL will be:
 
@@ -101,15 +159,18 @@ The resulting URL will be:
 http://localhost:3000/rest/products/search?q=%20%27))union%20SELECT%20sql,%27%27,%27%27,null,null,null,null,null,null%20FROM%20sqlite_master%20where%20name%20=%20%27Users%27--
 ```
 
-The columns are 9, corresponding to the ones returned in the `JSON`. The information about the Users table ( `sql`) will be returned in the first (`id`). The others are put to `null` to allow for the union select, since they have to be the same number of columns. However, for the `name` and `description`, using null returned an error, probably due to some internal check. That's why for them the empty string is used insted.
+* The columns are 9, corresponding to the ones returned in the `JSON`. 
+* The information about the Users table ( `sql`) will be returned in the first (`id`). 
+* The other columns are set to `null` to allow for the union select, since they have to be the same number of columns. 
+* However, setting the `name` and `description` to null returned an error, probably due to some internal check. That's why, for them, the empty string is used instead.
 
-This operation was successful and the information on the Users table is obtained. 
+This operation was successful, and the structure of the Users table is obtained. 
 
 <img src="images/Screenshot 2026-06-18 alle 17.06.59.png" alt=" " style="zoom:30%;" />
 
+Now that the names of the columns are known, the actual malevolent union select can be executed. The attacker can choose which information to obtain, but the most interesting ones could be the *password* and the *TOTP secret*. 
 
-
-Now that the name of the columns are known, the actual interesting union select can be executed. The syntax will be: `q=' UNION SELECT id, username, email, password, role, deluxeToken, lastLoginIp, totpSecret, profileImage FROM Users --`.
+A possible query could be: `q=' UNION SELECT id, username, email, password, role, deluxeToken, lastLoginIp, totpSecret, profileImage FROM Users --`.
 
 The resulting URL will be:
 
@@ -119,11 +180,46 @@ http://localhost:3000/rest/products/search?q=%27))%20UNION%20SELECT%20id,%20user
 
 <img src="images/Screenshot 2026-06-25 alle 12.52.08.png" alt="Screenshot 2026-06-25 alle 12.52.08" style="zoom:30%;" />
 
-### Undestanding root causes
+### Understanding root causes
 
-<img src="images/Screenshot 2026-06-18 alle 17.37.48.png" alt=" " style="zoom:30%;" />
+Similarly to the first challenge, the source code can be obtained from the "coding challenges". Here, the vulnerability is at line 5: the variable `criteria` is inserted in the SQL query with string interpolation. 
 
+```typescript
+export function searchProducts () {
+  return (req: Request, res: Response, next: NextFunction) => {
+    let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
+    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)
+      .then(([products]: any) => {
+        const dataString = JSON.stringify(products)
+        for (let i = 0; i < products.length; i++) {
+          products[i].name = req.__(products[i].name)
+          products[i].description = req.__(products[i].description)
+        }
+        res.json(utils.queryResultToJson(products))
+      }).catch((error: ErrorWithParent) => {
+        next(error.parent)
+      })
+  }
+}
+```
 
+To fix this vulnerability, the `sequelize` **replacement** mechanism can be used to create a prepared statement. This way the user input cannot be interpreted as SQL code.
 
+```typescript
+models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%:criteria%' OR description LIKE '%:criteria%') AND deletedAt IS NULL) ORDER BY name`, {replacements: { criteria }})
+```
 
+## Takeaways
 
+### SQLi classification
+
+In this report 2 challenges were described: one for authentication and one for data extraction.
+
+* The first, was a case of an in-band SQLi, with authentication bypass: the query involved the use of comments to ignore the rest of the SQL query and the verbose error from the server was observed to properly structure the exploit.
+* The second was also an in-band SQLi, in this case specifically a union-based attack, to obtain sensible data extraction: it involved finding an access point, understanding the structure of the table and finally constructing a union select to exploit the vulnerability.
+
+The important takeaway is this:
+
+* SQL vulnerabilities are common and exploiting them may have a big impact on confidentiality and authentication, as shown by this report. 
+* One possible defense is using **prepared statement**. 
