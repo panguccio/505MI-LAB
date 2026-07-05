@@ -10,8 +10,8 @@ Fourth laboratory for the **Cybersecurity Laboratory** course.
 
 The objective of this laboratory was to successfully execute and document an **SSLStrip attack** using the BURP Proxy on:
 
-* [a website that doesn't use Strict Transport Security](##Case A: Website without HSTS)
-* [a website that uses Strict Transport Security](##Case B: Website with HSTS)
+* [a website that doesn't use Strict Transport Security](#case-a-website-without-hsts)
+* [a website that uses Strict Transport Security](#case-b-website-with-hsts)
 
 Specifically, the report focuses on:
 
