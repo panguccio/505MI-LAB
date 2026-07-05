@@ -31,7 +31,7 @@ docker compose up --build
 
 The three machines involved in the lab were **A**, **B** and **M**.
 
-![Screenshot 2026-07-03 alle 10.40.53](images/Screenshot 2026-07-03 alle 10.40.53.png)
+<img src="images/Screenshot 2026-07-03 alle 10.40.53.png" alt=" " style="zoom:80%;" />
 
 Then, to execute the lab, in three different terminals the shells of each container were opened with the following command.
 
@@ -83,7 +83,7 @@ python3 task1a.py
 
 The task was successful, which was evident by analysing A's arp cache. 
 
-![Screenshot 2026-07-03 alle 10.51.08](images/Screenshot 2026-07-03 alle 10.51.08.png)
+<img src="images/Screenshot 2026-07-03 alle 10.51.08.png" style="zoom:100%;" />
 
 ### Task 1.b
 
@@ -119,7 +119,7 @@ ip -s -s neigh flush all
 
 Then A pings B, so that B's IP is contained in A's cache. By executing the script from M, the ARP poisoning was successful, because the IP is updated with M's MAC address. 
 
-![Screenshot 2026-07-03 alle 11.53.32](images/Screenshot 2026-07-03 alle 11.53.32.png)
+<img src="images/Screenshot 2026-07-03 alle 11.53.32.png" alt=" " style="zoom:80%;" />
 
 #### Scenario 2
 
@@ -216,7 +216,7 @@ With  forwarding off, M received the packets from A, but did not forward them to
 
 In the ping statistics the packet loss is very high: the majority of the packets are received by M and ignored. However, some of the packets (in this case exactly 4) are received by B, since it returns a `pong`. This could be due to the fact that in the 5 seconds interval, before the next ARP poisoning, A is able to obtain the real MAC address of B.
 
-<img src="images/Screenshot 2026-07-03 alle 12.10.03.png" style="zoom:50%;" />
+<img src="images/Screenshot 2026-07-03 alle 12.10.03.png" style="zoom:60%;" />
 
 #### Tshark
 
@@ -228,11 +228,11 @@ sudo tshark -i br-cc08238ff968
 
 From here, it can be observed that the requests from A receive no reply. 
 
-![Screenshot 2026-07-03 alle 12.17.17](images/Screenshot 2026-07-03 alle 12.17.17.png)
+<img src="images/Screenshot 2026-07-03 alle 12.17.17.png" alt=" " style="zoom:50%;" />
 
 In between the many ARP requests that are sent by M, a genuine ARP request from A and replied by B can be seen. This allows for the (very brief) `ICMP` communication between A and B, before M sends again the malicious requests.
 
-![Screenshot 2026-07-03 alle 12.24.27](images/Screenshot 2026-07-03 alle 12.24.27.png)
+<img src="images/Screenshot 2026-07-03 alle 12.24.27.png" alt=" " style="zoom:50%;" />
 
 The same result is obtained by doing the experiment the other way around, with B pinging A.
 
@@ -258,7 +258,7 @@ From the ping statistics, it can be seen that none of the packets are lost. They
 
 This is also evident by analysing the traffic.
 
-![Screenshot 2026-07-03 alle 12.30.12](images/Screenshot 2026-07-03 alle 12.30.12.png)
+<img src="images/Screenshot 2026-07-03 alle 12.30.12.png" alt=" " style="zoom:50%;" />
 
 With forwarding on, M acts as an AITM between A and B.
 
@@ -332,7 +332,7 @@ python3 snifnspoof.py
 
 The attack works: writing anything on A's terminal results in just Z letters.
 
-![Screenshot 2026-07-02 alle 22.41.38](images/Screenshot 2026-07-02 alle 22.41.38.png)
+<img src="images/Screenshot 2026-07-02 alle 22.41.38.png" alt=" " style="zoom:50%;" />
 
 ## Task 3: AITM Attack on Netcat
 

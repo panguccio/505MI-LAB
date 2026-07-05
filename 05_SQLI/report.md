@@ -45,7 +45,7 @@ An unexpected `[object Object]` appeared. If the website worked correctly, that 
 
 To ensure it was an SQL vulnerability, the Network tab in the Browser's Developer Tools was analysed to review the server's response. The response confirmed the vulnerability and allows for a **in-band SQLi**.
 
-![Screenshot 2026-06-24 alle 18.11.18](images/Screenshot 2026-06-24 alle 18.11.18.png)
+<img src="images/Screenshot 2026-06-24 alle 18.11.18.png" alt=" " style="zoom:50%;" />
 
 ### Exploit structure
 

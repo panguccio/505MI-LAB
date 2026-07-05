@@ -182,11 +182,11 @@ As suggested by `preload`, the domain is already present in the HSTS set of the 
 
 Now, from Burp embedded browser Chromium, by placing on http://github.com, the page is moved to https://github.com due to HSTS.  The browser trusts the Proxy, so the traffic is not interrupted all together.
 
-![Screenshot 2026-07-05 alle 14.56.01](images/Screenshot 2026-07-05 alle 14.56.01.png)
+<img src="images/Screenshot 2026-07-05 alle 14.56.01.png" alt=" " style="zoom:50%;" />
 
 By opening it on Firefox instead, using Burp as Proxy, the browser blocks entirely the HTTP packet and shows this error page, explaining it's due to HSTS. 
 
-![Screenshot 2026-07-05 alle 13.02.44](images/Screenshot 2026-07-05 alle 13.02.44.png)
+<img src="images/Screenshot 2026-07-05 alle 13.02.44.png" alt=" " style="zoom:50%;" />
 
 The difference in behaviour can be explained by the fact that Firefox doesn't automatically trust Burp certificate like Chromium does. 
 
@@ -194,7 +194,7 @@ The difference in behaviour can be explained by the fact that Firefox doesn't au
 
 After removing the website from the HSTS set of the browser Chromium, the SSLStrip is again possible, as accessing to http://github.com will not redirect.
 
-![Screenshot 2026-07-05 alle 15.08.10](images/Screenshot 2026-07-05 alle 15.24.46.png)
+<img src="images/Screenshot 2026-07-05 alle 15.24.46.png" alt=" " style="zoom:50%;" />
 
 This simulates the **vulnerability window**, i.e. the browser has never visited the site on `https` and so has never acquired the HSTS policy (**Trust On First Use**) or the policy has expired.
 
