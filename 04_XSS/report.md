@@ -18,7 +18,7 @@ Specifically, the report focuses on:
 * The exploitation attempts for solving the two challenges;
 * The difference between the two vulnerabilities, i.e., how the user input is handled in the two cases and why they are labeled as "DOM" and "Reflected”.
 
-### Setup Juice Shop
+### Set up Juice Shop
 
 #### Docker
 
