@@ -90,11 +90,11 @@ The objective for this challenge was to retrieve the entire database schema.
 
 The execution of this challenge is similar to ["User Credentials"](https://github.com/panguccio/505MI-LAB/blob/main/05_SQLI/report.md#user-table-structure)  and pretty straight-forward after solving that. 
 
-The entry point is in this case as well the `/rest/products/search?q=` API.
+The entry point is in this case as well `/rest/products/search?q=`.
 
 As seen in previous challenges, the application uses **SQLite** as DBMS. The information on the structure of the tables is therefore kept in the `sqlite_master` table.
 
-Simply by constructing a UNION select between `Products` and `sqlite_master`, the entire database schema can be obtained: ``UNION SELECT sql, "", "", null, null, null, null, null, null FROM sqlite_master--`.
+Simply by constructing a UNION select between `Products` and `sqlite_master`, the entire database schema can be obtained: `UNION SELECT sql, "", "", null, null, null, null, null, null FROM sqlite_master--`.
 
 The resulting URL will be:
 
