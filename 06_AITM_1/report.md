@@ -10,8 +10,8 @@ Fourth laboratory for the **Cybersecurity Laboratory** course.
 
 The objective of this laboratory was to successfully execute and document an **SSLStrip attack** using the BURP Proxy on:
 
-* [a website that doesn't use Strict Transport Security](#case-a-website-without-hsts)
-* [a website that uses Strict Transport Security](#case-b-website-with-hsts)
+* a website that [doesn't use Strict Transport Security](#case-a-website-without-hsts)
+* a website that [uses Strict Transport Security](#case-b-website-with-hsts)
 
 Specifically, the report focuses on:
 
@@ -94,27 +94,31 @@ Now, by placing on http://deeplearningbook.org, the page remains on HTTP.
 
 <img src="images/Screenshot 2026-07-04 alle 21.30.03.png" alt="Screenshot 2026-07-04 alle 21.30.03" style="zoom:50%;" />
 
-From BURP, it can be seen the Request made with HTTP and the response obtained with HTTPS.
+From BURP, request and response can be unpacked. All headers are visible and the response can be edited before forwarding it back to the client.
 
 <img src="images/Screenshot 2026-07-04 alle 21.37.43.png" alt="Screenshot 2026-07-04 alle 21.37.43" style="zoom:40%;" />
 
-### SSLStrip Attempts
+### Possible impact
+
+#### Stealing cookies
+Since the Proxy is able to see the values of the headers in clear, a possible impact could be stealing the client's cookies.
+
 
 #### Match and Replace in the Response
 
-With the menu option `match/replace`, some words from the response can be changed automatically.
+With the menu option `match/replace`, some words from the response can be changed automatically. 
 
 <img src="images/Screenshot 2026-07-04 alle 21.53.54.png" alt=" " style="zoom:30%;" /><img src="images/Screenshot 2026-07-04 alle 21.56.37.png" alt=" " style="zoom:40%;" />
 
 #### Changing URLs
 
-Another rule can be added to change any url with whatever website of interest, for example a cloned version of Amazon to steal credentials or a link to download a malicious file.
+Another rule that can be added in `match/replace`, is to change any url with whatever website of interest, for example a cloned version of Amazon to steal credentials or a link to download a malicious file.
 
 <img src="images/Screenshot 2026-07-04 alle 22.38.45.png" alt="Screenshot 2026-07-04 alle 22.38.45" style="zoom:30%;" /><img src="images/Screenshot 2026-07-04 alle 22.39.47.png" alt="Screenshot 2026-07-04 alle 22.39.47" style="zoom:40%;" />
 
 #### Adding a login form
 
-Another possible idea could be adding an HTML form to the response, to then intercept username and password from Burp.
+Another possible idea could be adding an HTML form to the response and then intercept username and password from Burp.
 
 ```html
 <form action="/" method="post">
@@ -140,7 +144,7 @@ The second website analysed was `github.com`, the famous code hosting platform.
 
 ### Checking suitability
 
-As it can be seen by  `curl` return, by accessing the website with `http`, the response is a `301 Moved Permanently`. The HTTPS response contains the header `Strict-Transport-Security`, which implies that the website uses the HSTS protocol. This makes this website suitable for case B.
+As it can be seen by  `curl` return, by accessing the website with `http`, the response is a `301 Moved Permanently`. The HTTPS response contains the header `Strict-Transport-Security`, which implies that the website uses HSTS. This makes this website suitable for case B.
 
 * Result of `curl -I http://github.com`
 
@@ -188,8 +192,8 @@ By opening it on Firefox instead, using Burp as Proxy, the browser blocks entire
 
 <img src="images/Screenshot 2026-07-05 alle 13.02.44.png" alt=" " style="zoom:50%;" />
 
-The difference in behaviour can be explained by the fact that Firefox doesn't automatically trust Burp certificate like Chromium does. 
 
+The difference in behaviour can be explained by the fact that Firefox doesn't automatically trust Burp certificate like Chromium does. In both cases however, SSLStrip is not possible.
 #### Removing HSTS domain
 
 After removing the website from the HSTS set of the browser Chromium, the SSLStrip is again possible, as accessing to http://github.com will not redirect.
