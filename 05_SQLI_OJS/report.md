@@ -94,7 +94,7 @@ The entry point is in this case as well the `/rest/products/search?q=` API.
 
 As seen in previous challenges, the application uses **SQLite** as DBMS. The information on the structure of the tables is therefore kept in the `sqlite_master` table.
 
-Simply by constructing a UNION select between `Products` and `sqlite_master` and the products table, the entire database schema can be obtained: ``UNION SELECT sql, "", "", null, null, null, null, null, null FROM sqlite_master--`.
+Simply by constructing a UNION select between `Products` and `sqlite_master`, the entire database schema can be obtained: ``UNION SELECT sql, "", "", null, null, null, null, null, null FROM sqlite_master--`.
 
 The resulting URL will be:
 
