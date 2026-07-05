@@ -40,9 +40,7 @@ The OWASP Juice Shop application was deployed using Docker.
 
 <img src="images/Screenshot 2026-06-11 alle 17.12.22.png" alt="docker desktop container setup" style="zoom:30%;" />
 
-> [!NOTE]
->
-> The `NODE_ENV` is a environment variable to allow the "unsafe" version to run. This is important to execute some of the XSS challenges that would be otherwise blocked due to application-level security mechanisms.
+The `NODE_ENV` is a environment variable to allow the "unsafe" version to run. This is important to execute some of the XSS challenges that would be otherwise blocked due to application-level security mechanisms.
 
 Once initialized, the web application can be accessed at: `http://localhost:3000`
 
@@ -201,7 +199,7 @@ var oo = ( () => {
 }
 ```
 
-Since the variables are minified, the entire script was given to an LLM (Claude) to properly understand and derive each of the variables and understand better the logic behind. The output was this much more legible, although simplified, code. 
+Since all the identifiers were minified, the file was given to an LLM (Claude) to expand dependencies and transform the method into much more legible, although simplified, code, in order to grasp the logic behind it. 
 
 ```js
 class TrackOrderService {
@@ -218,7 +216,7 @@ class TrackOrderService {
 
 The variable `oo` actually corresponds to `TrackOrderService`. 
 
-Here the method `find` which is called in the vulnerable original code makes a GET request to `/rest/track-order/{id}` to get the details about the order (such as email, product names, quantities and total price).
+Here the method `find`, the one called in `ngOnInit`, makes a GET request to `/rest/track-order/{id}` to get the details about the order (such as email, product names, quantities and total price).
 
 After a rather unsuccessful trip (given that there's no order corresponding to the iframe), the payload returns to the client, without any validation. 
 
@@ -228,7 +226,7 @@ The vulnerable line is this one, in the `ngOnInt` method:
 this.results.orderNo = this.sanitizer.bypassSecurityTrustHtml(`<code>${e.data[0].orderId}</code>`),
 ```
 
-The resulting `orderId` from the HTTP response is inserted by the frontend inside an HTML tag, bypassing security. This way, what would be treated as text by default by Angular, is not sanitized and is interpreted as inner JS code by the browser.
+The resulting `orderId` from the HTTP response is inserted by the frontend inside an HTML tag, explicitly bypassing Angular security. This way, what would be treated as text by default is not sanitized, and is interpreted as inner JS code by the browser.
 
 ## Takeaways
 
