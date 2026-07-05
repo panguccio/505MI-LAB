@@ -216,8 +216,8 @@ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%:criteria%' O
 
 In this report 2 challenges were described: one for authentication and one for data extraction.
 
-* The first, was a case of an in-band SQLi, with authentication bypass: the query involved the use of comments to ignore the rest of the SQL query and the verbose error from the server was observed to properly structure the exploit.
-* The second was also an in-band SQLi, in this case specifically a union-based attack, to obtain sensible data extraction: it involved finding an access point, understanding the structure of the table and finally constructing a union select to exploit the vulnerability.
+* In the first case, the query involved the use of comments to ignore the rest of the SQL query and the verbose error from the server was observed to properly structure the exploit.
+* The second case was a union-based attack, to obtain sensible data extraction: it involved finding an access point, understanding the structure of the table and finally constructing a union select to exploit the vulnerability.
 
 The important takeaway is this:
 
