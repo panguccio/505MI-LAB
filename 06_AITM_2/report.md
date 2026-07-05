@@ -8,15 +8,15 @@ Fifth laboratory for the **Cybersecurity Laboratory** course.
 
 ### Lab aim
 
-The objective of this laboratory was to execute and document an **ARP attack** from the SEED Labs. The tasks to complete were:
+The objective of this laboratory was to execute and document an **ARP attack** following the SEED Lab guide. The tasks to complete were:
 
-* [ARP cache poisoning](##Task 1: ARP Cache Poisoning)
-* [AITM attack on Telnet](##Task 2: AITM Attack on Telnet)
-* [AITM attack on Netcat](##Task 3: AITM Attack on Netcat)
+* [ARP cache poisoning](#task-1-arp-cache-poisoning)
+* [AITM attack on Telnet](#task-2-aitm-attack-on-telnet)
+* [AITM attack on Netcat](#task-3-aitm-attack-on-netcat)
 
 ### Set up VM
 
-The host machine used for the set up was a MacBook with an M3 processor. So the guide for that was followed, which involved:
+The host machine used for the set up was a MacBook with an M3 processor. The [corresponding guide](https://github.com/seed-labs/seed-labs/blob/master/lab-setup/apple-arm/seedvm-fusion.md) was followed, which involved:
 
 * downloading **VMware Fusion**
 * downloading **Ubuntu ISO** and installing it
@@ -33,13 +33,13 @@ The three machines involved in the lab were **A**, **B** and **M**.
 
 <img src="images/Screenshot 2026-07-03 alle 10.40.53.png" alt=" " style="zoom:80%;" />
 
-Then, to execute the lab, in three different terminals the shells of each container were opened with the following command.
+Then, to execute the lab, the following command was executed to access to the shell of each container.
 
 ```bash
 sudo docker exec -it <container-name> bash
 ```
 
-With `ifconfig`, the MAC addresses of each can be found and annotated.
+With `ifconfig`, the MAC addresses of each machine can be found and annotated.
 
 | Container | IP           | MAC                 |
 | --------- | ------------ | ------------------- |
@@ -53,7 +53,7 @@ The first task of the lab involved executing **ARP Cache Poisoning**.
 
 ### Task 1.a
 
-The first task was to construct an **ARP request packet** for mapping B's IP with M's MAC address. 
+The first goal was to construct an **ARP request packet** in order to map B's IP with M's MAC address. 
 
 In the folder `/volumes` the script `task1a.py` was written.
 
@@ -75,7 +75,7 @@ pkt = E/A
 sendp(pkt)
 ```
 
-Then from M, it was sent to A.
+Then it was executed from M and the packet was sent to A.
 
 ```bash
 python3 task1a.py
@@ -87,7 +87,7 @@ The task was successful, which was evident by analysing A's arp cache.
 
 ### Task 1.b
 
-The second task was similar, but using an **ARP reply packet** and checking if it was successful in two different scenarios: IP of B is in A's cache or A's cache is empty.
+The second task was similar, but using an **ARP reply packet** and checking if it was successful in two different scenarios: IP of B is in A's cache or A's cache empty.
 
 The script `task1b.py` in this case was different only on line 5, to indicate that the packet is an ARP reply instead of a request.
 
@@ -117,7 +117,7 @@ ip -s -s neigh flush all
 
 #### Scenario 1
 
-Then A pings B, so that B's IP is contained in A's cache. By executing the script from M, the ARP poisoning was successful, because the IP is updated with M's MAC address. 
+A pings B, so that B's IP is contained in A's cache. By executing the script from M, the ARP poisoning was successful, because the IP is updated with M's MAC address. 
 
 <img src="images/Screenshot 2026-07-03 alle 11.53.32.png" alt=" " style="zoom:80%;" />
 
@@ -208,13 +208,11 @@ For the next step, A and B had to ping each other with IP forwarding on host M t
 sysctl net.ipv4.ip_forward=0
 ```
 
-Then A tries to ping B.
-
 With  forwarding off, M received the packets from A, but did not forward them to B. Therefore, A didn't receive a reply. This can be seen both by the ping statistics and by analysing the traffic with `tshark`.
 
 #### Ping statistics
 
-In the ping statistics the packet loss is very high: the majority of the packets are received by M and ignored. However, some of the packets (in this case exactly 4) are received by B, since it returns a `pong`. This could be due to the fact that in the 5 seconds interval, before the next ARP poisoning, A is able to obtain the real MAC address of B.
+In the ping statistics the packet loss is very high: the majority of the packets are received by M and ignored. However, some of the packets (in this case exactly 4) are received by B, since it returns a reply to A. This could be due to the fact that in the 5 seconds interval, before the next ARP poisoning, A is able to obtain the real MAC address of B.
 
 <img src="images/Screenshot 2026-07-03 alle 12.10.03.png" style="zoom:60%;" />
 
@@ -270,7 +268,7 @@ Now, the entire attack on Telnet can be executed. Initially, M allows forwarding
 sysctl net.ipv4.ip_forward=1
 ```
 
-Then A connects to B using `telnet`, then enter username (`seed`) and password (`dees`). A can then access to a command-line interface on B.
+Then A connects to B using `telnet`, then enters username (`seed`) and password (`dees`).
 
 ```bash
 telnet 10.9.0.6
@@ -282,7 +280,7 @@ Now every character written by A is sent inside TCP packets to B's IP address, w
 
 The following `snifandspoof.py` script is written for M, following the SEED guide. 
 
-* **A → B**:This script intercepts packets from A and transforms the characters to the letter `"Z"`.
+* **A → B**: This script intercepts packets from A and transforms the characters to the letter `"Z"`.
 * **B → A**: The packets sent from B back to A are not changed and just forwarded.
 
 ```python
