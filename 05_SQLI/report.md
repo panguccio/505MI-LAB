@@ -10,8 +10,8 @@ Third laboratory for the **Cybersecurity Laboratory** course.
 
 The objective of this laboratory was to execute and document at least two **SQL injection** challenges within the OWASP Juice Shop environment, in the categories:
 
-* attack to [bypass authentication](##Bypass Authentication)
-* attack to [extract data](##Extract Data)
+* attack to [bypass authentication](#bypass-authentication)
+* attack to [extract data](#extract-data)
 
 Specifically, the report focuses on: 
 
