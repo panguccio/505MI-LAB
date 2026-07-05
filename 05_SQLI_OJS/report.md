@@ -109,5 +109,5 @@ http://localhost:3000/rest/products/search?q=%20%27))union%20SELECT%20sql,%27%27
 
 The response contained the SQL definitions of all tables stored in `sqlite_master`, successfully completing the challenge.
 
-![Screenshot 2026-07-05 alle 21.46.52](images/Screenshot 2026-07-05 alle 21.46.52.png)
+<img src="images/Screenshot 2026-07-05 alle 21.46.52.png" alt=" " style="zoom:50%;" />
 
