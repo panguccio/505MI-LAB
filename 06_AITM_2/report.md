@@ -1,6 +1,6 @@
-# Lab 6: AITM 2
+# Lab 5: AITM 2
 
-Sixth laboratory for the **Cybersecurity Laboratory** course.
+Fifth laboratory for the **Cybersecurity Laboratory** course.
 
 **Objective:** follow the [**SEED Lab on ARP attacks**](https://seedsecuritylabs.org/Labs_20.04/Files/ARP_Attack/ARP_Attack.pdf) and describe the performed steps and the observed results.
 
@@ -39,7 +39,7 @@ Then, to execute the lab, in three different terminals the shells of each contai
 sudo docker exec -it <container-name> bash
 ```
 
-By doing `ifconfig`, the MAC addresses of each can be found.
+With `ifconfig`, the MAC addresses of each can be found and annotated.
 
 | Container | IP           | MAC                 |
 | --------- | ------------ | ------------------- |
@@ -342,7 +342,7 @@ Firstly, B opens a Netcat server with `nc -lp 9090`. A connects to B with `nc 10
 
 With IP forwarding enabled on M, everything works normally.
 
-<img src="images/Screenshot 2026-07-02 alle 22.49.59.png" alt=" " style="zoom:50%;" /><img src="images/Screenshot 2026-07-02 alle 22.50.03.png" alt=" " style="zoom:50%;" />
+<img src="images/Screenshot 2026-07-02 alle 22.49.59.png" alt=" " style="zoom:60%;" /><img src="images/Screenshot 2026-07-02 alle 22.50.03.png" alt=" " style="zoom:60%;" />
 
 As in Task 2, forwarding is turned off and the same `snifnspoof.py` script is executed from M's machine, with the only difference being in how the data is transformed. The string `"anna"` is replaced with `"AAAA"`.
 
@@ -352,5 +352,5 @@ newdata = data.replace(b"anna", b"AAAA")
 
 The attack is successful: any occurrence of the name is replaced before reaching B.
 
-<img src="images/Screenshot 2026-07-02 alle 23.01.36.png" alt=" " style="zoom:50%;" /><img src="images/Screenshot 2026-07-02 alle 23.01.42.png" alt=" " style="zoom:50%;" />
+<img src="images/Screenshot 2026-07-02 alle 23.01.36.png" alt=" " style="zoom:60%;" /><img src="images/Screenshot 2026-07-02 alle 23.01.42.png" alt=" " style="zoom:60%;" />
 
