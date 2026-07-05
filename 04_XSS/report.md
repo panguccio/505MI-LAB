@@ -10,8 +10,8 @@ Second laboratory for the **Cybersecurity Laboratory** course.
 
 The objective of this laboratory was to successfully execute and document two distinct types of XSS challenges within the OWASP Juice Shop environment:
 
-* a [DOM XSS](##DOM XSS) attack
-* a [Reflected XSS](##Reflected XSS) attack
+* a [DOM XSS](#dom-xss) attack
+* a [Reflected XSS](##reflected-xss) attack
 
 Specifically, the report focuses on:
 
