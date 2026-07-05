@@ -2,7 +2,7 @@
 
 Third laboratory for the **Cybersecurity Laboratory** course.
 
-**Objective:** exploit and understand SQLi vulnerabilities using the [**OWASP Juice Shop**](https://owasp.org/www-project-juice-shop/) web application.
+**Objective:** To exploit and understand SQLi vulnerabilities using the [**OWASP Juice Shop**](https://owasp.org/www-project-juice-shop/) web application.
 
 ## Introduction
 
@@ -129,11 +129,11 @@ models.sequelize.query(
 
 The objective for this challenge is to retrieve a list of usernames and credentials from the `Users` table.
 
-### Access point
+### Entry point
 
-To extract sensible data, finding the access point is less direct. The idea is to search for an HTTP request that explicitly returns database data as `JSON` and see if it's vulnerable to SQLi.
+To extract sensible data, finding the entry point is less direct. The idea is to search for an HTTP request that explicitly returns database data as `JSON` and see if it's vulnerable to SQLi.
 
-On the homepage, all the products are available at first access. By disabling cache and analysing the HTTP history with Burp, a request to `/rest/products/search?q=` can be found, it returns a `JSON`.
+On the homepage, all the products are available at first access. By disabling cache and analysing the HTTP history with Burp, a request to `/rest/products/search?q=` can be found, it returns a `JSON` document.
 
 <img src="images/Screenshot 2026-06-18 alle 15.44.06.png" alt=" " style="zoom:40%;" />
 
@@ -160,9 +160,9 @@ http://localhost:3000/rest/products/search?q=%20%27))union%20SELECT%20sql,%27%27
 ```
 
 * The columns are 9, corresponding to the ones returned in the `JSON`. 
-* The information about the Users table ( `sql`) will be returned in the first (`id`). 
+* The information about the tables (`sql`) will be returned in the first field of the response (`id`). 
 * The other columns are set to `null` to allow for the union select, since they have to be the same number of columns. 
-* However, setting the `name` and `description` to null returned an error, probably due to some internal check. That's why, for them, the empty string is used instead.
+* However, setting the `name` and `description` to null returned an error, likely due to some internal non-null check. That's why, for them, the empty string is used instead.
 
 This operation was successful, and the structure of the Users table is obtained. 
 

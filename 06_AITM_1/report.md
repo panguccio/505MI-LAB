@@ -2,7 +2,7 @@
 
 Fourth laboratory for the **Cybersecurity Laboratory** course.
 
-**Objective:** execute **SSLStrip** on [**BURP**](https://portswigger.net/burp) Proxy on two different websites.
+**Objective:** To execute **SSLStrip** on [**BURP**](https://portswigger.net/burp) Proxy on two different websites.
 
 ## Introduction
 

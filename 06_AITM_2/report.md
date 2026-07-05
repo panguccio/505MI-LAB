@@ -2,7 +2,7 @@
 
 Fifth laboratory for the **Cybersecurity Laboratory** course.
 
-**Objective:** follow the [**SEED Lab on ARP attacks**](https://seedsecuritylabs.org/Labs_20.04/Files/ARP_Attack/ARP_Attack.pdf) and describe the performed steps and the observed results.
+**Objective:** To follow the [**SEED Lab on ARP attacks**](https://seedsecuritylabs.org/Labs_20.04/Files/ARP_Attack/ARP_Attack.pdf) and describe the performed steps and the observed results.
 
 ## Introduction
 

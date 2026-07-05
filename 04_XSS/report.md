@@ -2,7 +2,7 @@
 
 Second laboratory for the **Cybersecurity Laboratory** course.
 
-**Objective:** exploit and understand XSS vulnerabilities using the [**OWASP Juice Shop**](https://owasp.org/www-project-juice-shop/) web application.
+**Objective:** To exploit and understand XSS vulnerabilities using the [**OWASP Juice Shop**](https://owasp.org/www-project-juice-shop/) web application.
 
 ## Introduction
 
@@ -80,7 +80,7 @@ The attempt was successful, as the payload was executed, rendering the alert box
 
 To understand what was happening "under the hood", the client-side source code was inspected using the browser's **Developer Tools** (Sources tab). The core application logic was found in the `main.js` file and, specifically for this challenge, within the `filterTable()` method.
 
-```js
+```typescript
 filterTable() {
             let e = this.route.snapshot.queryParams.q; // get the value of q from the query
             e ? (e = e.trim(),
@@ -147,7 +147,7 @@ The execution was similar to the first challenge, however what was going on unde
 
 Analyzing the `main.js` file, the logic for getting the tracking informations was expressed by `ngOnInit()`. 
 
-```js
+```typescript
 ngOnInit() {
             this.orderId = this.route.snapshot.queryParams.id,
             this.trackOrderService.find(this.orderId).subscribe(e => {
@@ -172,7 +172,7 @@ To understand better what is going on, the logic for the method `find` needs to 
 
 By searching for "track-order" we can find the class definition of `oo`. This is a HTTP Angular service defined as a anonymous class.
 
-```js
+```typescript
 var oo = ( () => {
     class t {
         http = m(ue);
@@ -201,7 +201,7 @@ var oo = ( () => {
 
 Since all the identifiers were minified, the file was given to an LLM (Claude) to expand dependencies and transform the method into much more legible, although simplified, code, in order to grasp the logic behind it. 
 
-```js
+```typescript
 class TrackOrderService {
   http = HttpClient;
   hostServer = environment.hostServer;
@@ -222,7 +222,7 @@ After a rather unsuccessful trip (given that there's no order corresponding to t
 
 The vulnerable line is this one, in the `ngOnInt` method:
 
-```js
+```typescript
 this.results.orderNo = this.sanitizer.bypassSecurityTrustHtml(`<code>${e.data[0].orderId}</code>`),
 ```
 
