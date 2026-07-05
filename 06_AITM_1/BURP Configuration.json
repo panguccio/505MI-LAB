@@ -624,10 +624,17 @@
             },
             {
                 "category":"regex",
-                "enabled":true,
+                "enabled":false,
                 "rule_type":"response_body",
                 "string_match":"href=\"([^\"]+)\"",
                 "string_replace":"href=\"http://salamuccio.com\""
+            },
+            {
+                "category":"literal",
+                "enabled":true,
+                "rule_type":"response_body",
+                "string_match":"The future of building",
+                "string_replace":"Hacking"
             }
         ],
         "miscellaneous":{
@@ -660,7 +667,7 @@
                 "listen_mode":"loopback_only",
                 "listener_port":8080,
                 "redirect_to_port":443,
-                "running":false,
+                "running":true,
                 "use_custom_tls_protocols":false
             },
             {
@@ -674,19 +681,19 @@
                 "enable_http2":true,
                 "listen_mode":"loopback_only",
                 "listener_port":8080,
-                "running":true,
+                "running":false,
                 "use_custom_tls_protocols":false
             }
         ],
         "response_modification":{
-            "convert_https_links_to_http":false,
+            "convert_https_links_to_http":true,
             "enable_disabled_form_fields":false,
             "highlight_unhidden_fields":false,
             "remove_all_javascript":false,
             "remove_input_field_length_limits":false,
             "remove_javascript_form_validation":false,
             "remove_object_tags":false,
-            "remove_secure_flag_from_cookies":false,
+            "remove_secure_flag_from_cookies":true,
             "unhide_hidden_form_fields":false
         },
         "ssl_pass_through":{
